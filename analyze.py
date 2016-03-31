@@ -1,4 +1,4 @@
-# Description: the a naive implementation of Google's PageRank algorithm.
+# Description: a naive implementation of Google's PageRank algorithm.
 #              this file is meant for illustration purposes ONLY.
 #              don't use it in production environments.
 # Author: Abdelrahman Hosny
