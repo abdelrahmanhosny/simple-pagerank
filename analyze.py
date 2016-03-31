@@ -1,7 +1,10 @@
-# Description: the most basic implementation of the PageRank algorithm
+# Description: the a naive implementation of Google's PageRank algorithm.
+#              this file is meant for illustration purposes ONLY.
+#              don't use it in production environments.
 # Author: Abdelrahman Hosny
 # Class: UConn, CSE 3504, Spring 2016
-# Instructor: Swapna Gokhale
+# Instructor: Swapna Gokhale <ssg@eng.uconn.edu>
+# TA: Abdelrahman Hosny <abdelrahman@engr.uconn.edu>
 
 from __future__ import division
 import numpy as np
@@ -14,7 +17,7 @@ nj = defaultdict(lambda: 0.0)           # number of outgoing link from node j
 # Markov Chain variables
 P = np.zeros(shape=(0,0))               # the transition matrix
 p = np.zeros(shape=(0))                 # the state vector
-damping_factor = 0.85
+damping_factor = 0.85                   # the damping factor
 
 with open('hollins.dat', 'r') as data_file:
     number_of_websites, number_of_hyperlinks = map(int, data_file.readline().strip().split(' '))
@@ -42,7 +45,7 @@ with open('hollins.dat', 'r') as data_file:
             if graph[j][i] == 1:
                 P[i][j] = 1 / nj[j]
 
-    P = np.add(np.multiply(P, damping_factor), (1 - damping_factor))
+    P = P * damping_factor + (1-damping_factor)
 
     iteration = 0
     while True:
@@ -50,7 +53,17 @@ with open('hollins.dat', 'r') as data_file:
         previous = p
         p = np.dot(previous, P)
         if np.array_equal(previous, p) or np.inf in p:
+            # reaching a steady state
             p = previous
-            print len(np.argwhere(p == np.amax(p)))
-            print len(np.argwhere(p == np.amin(p)))
-            break
+            first_rank_websites = np.argwhere(p == np.amax(p))
+            last_rank_websites = np.argwhere(p == np.amin(p))
+            with open('ranks_'+str(damping_factor)+'.txt', 'w') as result_file:
+                result_file.write('First Ranked Website(s)\n')
+                for index in first_rank_websites:
+                    result_file.write(str(index[0]+1) + ' ' + websites[index[0]] + '\n')
+                result_file.write('\n')
+                result_file.write('Last Ranked Website(s)\n')
+                for index in last_rank_websites:
+                    result_file.write(str(index[0]+1) + ' ' + websites[index[0]] + '\n')
+            print 'Results written to file ..'
+            break  # break from the infinite loop
